@@ -1,3 +1,4 @@
+import React from "react";
 import config from "../config.json";
 import styled from "styled-components";
 import { CSSReset } from "../src/components/CSSReset";
@@ -10,14 +11,15 @@ function HomePage() {
   };
 
   // console.log(config.playlists);
+  const [valorDoFiltro, setValorDoFiltro] = React.useState("");
 
   return (
     <>
     <CSSReset/>
     <div style={estilosHome}>
-      <Menu></Menu>
+      <Menu valorDoFiltro={valorDoFiltro} setValorDoFiltro={setValorDoFiltro}></Menu>
       <Header></Header>
-      <TimeLine playlists={config.playlists}></TimeLine>
+      <TimeLine searchValue={valorDoFiltro} playlists={config.playlists}></TimeLine>
     </div>
     </>
   );
@@ -36,7 +38,7 @@ const StyledHeader = styled.div`
     border-radius: 50%;
   }
   .user-info {
-    margin-top: 50px;
+    /* margin-top: 50px; */
     display: flex;
     align-items: center;
     width: 100%;
@@ -44,9 +46,14 @@ const StyledHeader = styled.div`
     gap: 16px;
   }
 `;
+const StyledBanner = styled.div`
+    background-image: url(${config.banner});
+    height: 230px;
+`;
 function Header() {
   return (
     <StyledHeader>
+      <StyledBanner/>
       {/* <img src="banner"/> */}
       <section className="user-info">
         <img src={`https://github.com/${config.github}.png`} />
@@ -59,7 +66,7 @@ function Header() {
   );
 }
 
-function TimeLine(props) {
+function TimeLine({searchValue, ...props}) {
   // console.log("Dentro do componente", props.playlists);
   const playlistNames = Object.keys(props.playlists);
 // Retorno por expressao
@@ -71,7 +78,11 @@ function TimeLine(props) {
             <section>
               <h2>{playlistNames}</h2>
               <div>
-                {videos.map((video) => {
+                {videos.filter((video)=> {
+                  const titleNormalized = video.title.toLowerCase();
+                  const searchValueNormalized = searchValue.toLowerCase();
+                  return titleNormalized.includes(searchValueNormalized)
+                }).map((video) => {
               return (
                 <a href={video.url}>
                   <img src={video.thumb}/>
